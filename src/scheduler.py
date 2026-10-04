@@ -161,7 +161,7 @@ class ProductionScheduler:
         # 1. 06:30 sáng: Quét Web chủ động
         self.scheduler.add_job(
             self.job_autonomous_discovery,  # Sử dụng self.job_autonomous_discovery
-            trigger=CronTrigger(hour=6, minute=30),
+            trigger=CronTrigger(hour=7, minute=0),
             id="job_autonomous_discovery",
             name="Autonomous Web Discovery",
             replace_existing=True,
@@ -170,7 +170,7 @@ class ProductionScheduler:
         # 2. 06:45 sáng: Cào nguồn cố định
         self.scheduler.add_job(
             self.execute_crawl_and_alert_pipeline,
-            trigger=CronTrigger(hour=6, minute=45),
+            trigger=CronTrigger(hour=7, minute=15),
             id="job_morning_crawl",
             name="Morning Crawl & AI Extraction",
             replace_existing=True,
@@ -179,7 +179,7 @@ class ProductionScheduler:
         # 3. 07:00 sáng: Phát bản tin sáng
         self.scheduler.add_job(
             self.broadcast_morning_briefing,
-            trigger=CronTrigger(hour=7, minute=0),
+            trigger=CronTrigger(hour=7, minute=30),
             id="job_morning_briefing",
             name="Broadcast Daily Morning Bulletin",
             replace_existing=True,
