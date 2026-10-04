@@ -61,7 +61,7 @@ class ProductionScheduler:
                 is_new = db.upsert_event(cleaned_ev)
                 
                 # Cảnh báo HITL khi phát hiện domain mới
-                if is_new and discovery_engine.check_unregistered_source(art.url):
+                if is_new and ai_search_discovery.check_unregistered_source(art.url):
                     if hasattr(notifier, "notify_unregistered_source"):
                         await notifier.notify_unregistered_source(cleaned_ev, art.url)
 
