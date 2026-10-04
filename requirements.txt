@@ -20,3 +20,4 @@ pytest
 pydantic-settings
 apscheduler
 trafilatura
+pandas
