@@ -6,7 +6,6 @@ SRC_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(SRC_DIR))
 
-from flask import app
 from telegram.ext import ApplicationBuilder, CommandHandler
 from config.settings import settings
 from core.loggers import get_logger
