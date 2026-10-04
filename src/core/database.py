@@ -8,6 +8,9 @@ from typing import Generator, List, Optional
 from src.core.loggers import get_logger
 from src.core.models import CrawlLogItem, EventItem, PriorityEnum, SourceItem, SubscriberItem
 
+import os
+os.makedirs("data", exist_ok=True)
+
 logger = get_logger("database")
 
 # Đường dẫn DB mặc định

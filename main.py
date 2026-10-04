@@ -1,5 +1,4 @@
 import asyncio
-import os
 import signal
 import sys
 from pathlib import Path
@@ -16,6 +15,9 @@ from core.database import db
 from core.loggers import get_logger
 from src.bot.app import create_bot_app
 from src.scheduler import production_scheduler
+
+import os
+os.makedirs("data", exist_ok=True)
 
 logger = get_logger("system.main")
 
