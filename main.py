@@ -1,23 +1,49 @@
 import asyncio
+import os
 import signal
 import sys
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from telegram import BotCommand, BotCommandScopeChat, BotCommandScopeDefault
 from telegram.ext import Application
 
+# 0. Thiết lập đường dẫn thư mục
 BASE_DIR = Path(__file__).resolve().parent
 SRC_DIR = BASE_DIR / "src"
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(SRC_DIR))
 
+# Đảm bảo thư mục lưu trữ data luôn tồn tại
+os.makedirs("data", exist_ok=True)
+
+# 1. HTTP Server giả lập để Render Free Web Service nhận diện Port
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+    def log_message(self, format, *args):
+        pass  # Tắt bớt log truy cập để tránh rác terminal
+
+
+def run_health_check_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    server.serve_forever()
+
+
+# Chạy HTTP server trên một luồng nền (daemon thread)
+threading.Thread(target=run_health_check_server, daemon=True).start()
+
+# 2. Import các module nội bộ của dự án
 from config.settings import settings
 from core.database import db
 from core.loggers import get_logger
 from src.bot.app import create_bot_app
 from src.scheduler import production_scheduler
-
-import os
-os.makedirs("data", exist_ok=True)
 
 logger = get_logger("system.main")
 
@@ -28,7 +54,6 @@ async def register_bot_commands(app: Application):
     - Người dùng thông thường: Chỉ thấy các lệnh tra cứu & xuất file.
     - Admin: Thấy toàn bộ lệnh thường + các lệnh quản trị hệ thống.
     """
-    # 1. Danh sách lệnh công khai cho mọi người dùng
     user_commands = [
         BotCommand("homnay", "Xem sự kiện diễn ra trong hôm nay"),
         BotCommand("tuannay", "Xem sự kiện trong 7 ngày tới"),
@@ -44,7 +69,7 @@ async def register_bot_commands(app: Application):
         await app.bot.set_my_commands(user_commands, scope=BotCommandScopeDefault())
         logger.info("Đã đăng ký Menu lệnh công khai (Default Scope).")
 
-        # 2. Đăng ký Menu riêng dành cho Admin nếu có TELEGRAM_ADMIN_ID hợp lệ
+        # Đăng ký Menu riêng dành cho Admin nếu có TELEGRAM_ADMIN_ID hợp lệ
         admin_id_raw = str(settings.TELEGRAM_ADMIN_ID).strip()
         if admin_id_raw and admin_id_raw.isdigit() and int(admin_id_raw) != 0:
             admin_id = int(admin_id_raw)
@@ -54,13 +79,12 @@ async def register_bot_commands(app: Application):
                 BotCommand("crawl_now", "⚡ [Admin] Kích hoạt cào tin tức thì"),
             ]
             await app.bot.set_my_commands(
-                admin_commands,
-                scope=BotCommandScopeChat(chat_id=admin_id)
+                admin_commands, scope=BotCommandScopeChat(chat_id=admin_id)
             )
             logger.info(f"Đã đăng ký Menu lệnh bí mật cho Admin Chat ID: {admin_id}")
-
     except Exception as e:
         logger.warning(f"Lỗi khi thiết lập Menu lệnh Telegram: {e}")
+
 
 async def main():
     logger.info("==========================================================")
@@ -86,7 +110,7 @@ async def main():
         production_scheduler.shutdown()
         stop_event.set()
 
-    # Bắt tín hiệu Ctrl+C tương thích cả Windows và Linux
+    # Bắt tín hiệu dừng tương thích cả Windows và Linux
     if sys.platform != "win32":
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGINT, signal.SIGTERM):
@@ -109,8 +133,7 @@ async def main():
         # Dừng bot nhẹ nhàng
         await bot_app.updater.stop()
         await bot_app.stop()
-
-    logger.info("🏁 Toàn bộ hệ thống đã tắt an toàn.")
+        logger.info("🏁 Toàn bộ hệ thống đã tắt an toàn.")
 
 
 if __name__ == "__main__":
