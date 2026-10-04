@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  telecom-event-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telecom_event_bot
+    restart: unless-stopped
+    
+    # Nạp biến môi trường bảo mật
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - PYTHONUNBUFFERED=1
+    
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config:ro  # ro: Read-Only giúp bảo vệ file config không bị ghi đè
+    
+    # Giới hạn tài nguyên để bảo vệ VPS chạy 24/7 ổn định
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 128M
+
+    # Quản lý dung lượng ghi log, tránh làm tràn ổ cứng VPS
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

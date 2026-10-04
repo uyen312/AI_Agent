@@ -1,0 +1,22 @@
+# AI & Data Extraction
+google-genai
+pydantic
+
+# Telegram Bot & Background Scheduling
+python-telegram-bot[job-queue]
+pytz
+
+# Environment & Config
+python-dotenv
+
+# Crawler & HTML Parsing
+requests
+beautifulsoup4
+feedparser
+
+# Export Excel
+openpyxl
+pytest
+pydantic-settings
+apscheduler
+trafilatura

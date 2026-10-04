@@ -1,0 +1,75 @@
+# Phạm vi: TP. Hồ Chí Minh, Đồng Nai, Tây Ninh, An Giang, Đồng Tháp, Vĩnh Long, Cần Thơ, Cà Mau
+
+sources:
+  - name: "Tuổi Trẻ - Văn Hóa & Lễ Hội"
+    url: "https://tuoitre.vn/rss/van-hoa.rss"
+    source_type: "rss"
+    parser_type: "rss"
+    province: "ALL"
+    description: "Sự kiện văn hóa, đại nhạc hội, triển lãm, lễ kỷ niệm"
+
+  - name: "Tuổi Trẻ - Du Lịch Miền Nam"
+    url: "https://tuoitre.vn/rss/du-lich.rss"
+    source_type: "rss"
+    parser_type: "rss"
+    province: "ALL"
+    description: "Điểm đến văn hóa, lễ hội các tỉnh miền Nam"
+
+  - name: "VnExpress - Du Lịch & Lễ Hội"
+    url: "https://vnexpress.net/rss/du-lich.rss"
+    source_type: "rss"
+    parser_type: "rss"
+    province: "ALL"
+    description: "Lễ hội du lịch, ẩm thực, văn hóa phía Nam"
+
+  - name: "Thanh Niên - Văn Hóa & Giải Trí"
+    url: "https://thanhnien.vn/rss/van-hoa.rss"
+    source_type: "rss"
+    parser_type: "rss"
+    province: "ALL"
+    description: "Đại nhạc hội, countdown, pháo hoa tại TP.HCM và miền Nam"
+
+  - name: "VietnamNet - Du Lịch & Sự Kiện"
+    url: "https://vietnamnet.vn/rss/du-lich.rss"
+    source_type: "rss"
+    parser_type: "rss"
+    province: "ALL"
+    description: "Tin tức lễ hội, sự kiện du lịch cả nước và miền Nam"
+
+  - name: "Báo An Giang - Du Lịch"
+    url: "https://baoangiang.com.vn/du-lich/"
+    source_type: "local_news"
+    parser_type: "html_scraping"
+    province: "An Giang"
+    selectors:
+      container: "div.b-content"
+      title: "h3.title a, h2 a, a"
+      link: "a[href*='-a']"
+
+  - name: "Báo Đồng Nai - Văn Hóa"
+    url: "https://baodongnai.com.vn/van-hoa/"
+    source_type: "local_news"
+    parser_type: "html_scraping"
+    province: "Đồng Nai"
+    selectors:
+      container: "div.item"
+      # Lấy thẻ a có chứa text (bỏ qua thẻ a bọc ảnh thumbnail)
+      title: "h2 a, h3 a, .title a, a:not(:empty)"
+      link: "h2 a, h3 a, a[href*='/van-hoa/'], a[href*='/dong-nai-cuoi-tuan/']"
+
+  - name: "Báo Tây Ninh - Văn Hóa Thể Thao"
+    url: "https://baotayninh.vn/van-hoa-the-thao-m3/"
+    source_type: "local_news"
+    parser_type: "html_scraping"
+    province: "Tây Ninh"
+    selectors:
+      container: "div.box-news, div.item-first, .list-news .item, div[class*='item']"
+      title: "h2 a, h3 a, a.title, a"
+      link: "a[href*='-a']"
+
+  - name: "Ticketbox - Sự Kiện & Giải Trí"
+    url: "https://api-v2.ticketbox.vn/search/v2/recommended-events"
+    source_type: "ticketing"
+    parser_type: "api_json"
+    province: "TP. Hồ Chí Minh"
+    description: "Liveshow âm nhạc thương mại, triển lãm tương tác, giải chạy và workshop"
